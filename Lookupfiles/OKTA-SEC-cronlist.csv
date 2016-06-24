@@ -1,0 +1,12 @@
+cron,status
+(root) CMD (/sbin/start --quiet update-motd),unverified
+(root) CMD (/sbin/start --quiet update-motd) - <cron.info>,unverified
+(root) CMD (/usr/lib64/sa/sa2 -A),unverified
+(root) CMD (/usr/lib64/sa/sa2 -A) - <cron.info>,unverified
+(root) CMD (/usr/local/bin/archive-to-s3.sh) - <cron.info>,unverified
+(root) CMD (/usr/local/bin/audit_log_upload >> /var/log/audit_log_upload.log 2>&1),unverified
+(root) CMD (/usr/local/bin/repair.sh),unverified
+(root) CMD (/usr/local/bin/snapshot.sh),verified
+(root) CMD (HOSTNAME=`uname -n` /usr/local/bin/okta-anemometer-upload),unverified
+(root) CMD (aws s3 sync s3://okta-mysql-slow-query-logs /ebs/anemometer/slow_query_logs/ --region us-east-1),unverified
+(root) CMD (ln -sfn $(readlink /ebs/syslog/okta/today) /ebs/syslog/okta/yesterday; ln -sfn $(date +%Y%m%d) /ebs/syslog/okta/today) - <cron.info>,unverified
