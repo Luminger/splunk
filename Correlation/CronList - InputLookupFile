@@ -1,0 +1,22 @@
+source="/var/log/cron" process="CROND" NOT "zabbix" NOT "redis" NOT "zookeeper" NOT "elasticsearch" NOT "nomy-poller" NOT "run-parts /etc/cron.hourly" NOT "/usr/lib64/sa/sa1 1 1" NOT "/dev/null" NOT "/var/log/chef/client.log 2>&1" 
+NOT  [
+     | inputlookup okta-sec-cronlist 
+     | where status!="verified" 
+     | fields cron 
+     | rename cron as search 
+     | format
+     ]
+| rex field=_raw "CROND(?<someno>.*)\: (?<usercmd>.*)"
+| stats dc(OktaServer) as NoOfServers count by usercmd
+
+
+
+
+/**
+
+Use a custom inputlook with all field values returned, but without the field name. 
+Substituted in Base search for either verified / unverified checks
+Can be used for if cron=xyz --> bad
+Can be used for if cron!=xyz --> unverified
+
+**/
