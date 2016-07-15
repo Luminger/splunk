@@ -6,3 +6,10 @@ source="/var/log/secure" process="sudo" host!="*splunk*" tag!="error" idm_flags=
 | rex field=_raw "(?<test>.*): (?<usr>.*) : TTY=(?<tty>.*) ; PWD=(?<pwd>.*) ; USER=(?<user>.*) ; COMMAND=(?<base_cmd>.*)"
 | where COMMAND="/usr/bin/curl" OR COMMAND="/usr/bin/rm"
 | table usr pwd user base_cmd
+
+source="/var/log/secure" process="sudo" host!="*splunk*" tag!="error" idm_flags="000000" NOT "/usr/local/bin/zabbix-agent-tests" NOT "/usr/local/bin/check_health.rb" NOT "toggle" NOT "BECOME-SUCCESS"
+| convert ctime(_time) as timer
+| rex field=_raw "(?<test>.*): (?<usr>.*) : TTY=(?<tty>.*) ; PWD=(?<pwd>.*) ; USER=(?<user>.*) ; COMMAND=(?<base_cmd>.*)"
+| stats count by base_cmd
+or
+| stats values(timer) values(usr) values(USER) values(OktaServer) count by base_cmd
