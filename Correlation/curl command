@@ -3,5 +3,6 @@ source="/var/log/secure" process="sudo" host!="*splunk*" tag!="error" idm_flags=
 | table test usr tty pwd user base_cmd
 
 source="/var/log/secure" process="sudo" host!="*splunk*" tag!="error" idm_flags="000000" NOT "/usr/local/bin/zabbix-agent-tests" NOT "/usr/local/bin/check_health.rb"
-| rex field=_raw "(?<test>.*): (?<usr>.*) : TTY=(?<tty>.*) ; PWD=(?<pwd>.*) ; USER=(?<user>.*) ; (?<cmd>.*)"
-| where COMMAND="/usr/bin/curl"
+| rex field=_raw "(?<test>.*): (?<usr>.*) : TTY=(?<tty>.*) ; PWD=(?<pwd>.*) ; USER=(?<user>.*) ; COMMAND=(?<base_cmd>.*)"
+| where COMMAND="/usr/bin/curl" OR COMMAND="/usr/bin/rm"
+| table usr pwd user base_cmd
