@@ -1,0 +1,7 @@
+source="/var/log/secure" process="sudo" host!="*splunk*" tag!="error" idm_flags="000000" NOT "/usr/local/bin/zabbix-agent-tests" NOT "/usr/local/bin/check_health.rb"
+| rex field=_raw "(?<test>.*): (?<usr>.*) : TTY=(?<tty>.*) ; PWD=(?<pwd>.*) ; USER=(?<user>.*) ; (?<cmd>.*)"
+| table test usr tty pwd user cmd
+
+source="/var/log/secure" process="sudo" host!="*splunk*" tag!="error" idm_flags="000000" NOT "/usr/local/bin/zabbix-agent-tests" NOT "/usr/local/bin/check_health.rb"
+| rex field=_raw "(?<test>.*): (?<usr>.*) : TTY=(?<tty>.*) ; PWD=(?<pwd>.*) ; USER=(?<user>.*) ; (?<cmd>.*)"
+| where COMMAND="/usr/bin/curl"
