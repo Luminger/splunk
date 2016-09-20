@@ -1,0 +1,44 @@
+sourcetype="aws:cloudtrail" eventName="AuthorizeSecurityGroupIngress" OR eventName="AuthorizeSecurityGroupEgress" 
+                         OR eventName="RevokeSecurityGroupIngress" OR eventName="RevokeSecurityGroupEgress" 
+                            requestParameters.ipPermissions.items{}.fromPort!="" OR requestParameters.ipPermissions.items{}.toPort!=""
+| spath path=requestParameters.ipPermissions.items{}.fromPort output=fromPort
+| spath path=requestParameters.ipPermissions.items{}.toPort output=toPort
+| mvexpand fromPort
+| eval badFromPort=case(
+                    match(fromPort, "^20$"), "FTP-data",
+                    match(fromPort, "^21$"), "FTP",
+                    match(fromPort, "^22$"), "SSH",
+                    match(fromPort, "^23$"), "Telnet",
+                    match(fromPort, "^69$"), "TFTP",
+                    match(fromPort, "^80$"), "HTTP",
+                    match(fromPort, "^443$"), "HTTPs",
+                    match(fromPort, "^107$"), "rTelnet",
+                    match(fromPort, "^115$"), "sFTP",
+                    match(fromPort, "^194$"), "IRC",
+                    match(fromPort, "^873$"), "rSync",
+                    match(fromPort, "^992$"), "TelnetS",
+                    match(fromPort, "^514$"), "rShell",
+                    match(fromPort, "^3306$"), "MySQL",
+                    match(fromPort, "^8009$"), "TestPort",
+                    1=1, "Benign"
+                   )
+| eval badToPort=case(
+                    match(fromPort, "^20$"), "FTP-data",
+                    match(fromPort, "^21$"), "FTP",
+                    match(fromPort, "^22$"), "SSH",
+                    match(fromPort, "^23$"), "Telnet",
+                    match(fromPort, "^69$"), "TFTP",
+                    match(fromPort, "^80$"), "HTTP",
+                    match(fromPort, "^443$"), "HTTPs",
+                    match(fromPort, "^107$"), "rTelnet",
+                    match(fromPort, "^115$"), "sFTP",
+                    match(fromPort, "^194$"), "IRC",
+                    match(fromPort, "^873$"), "rSync",
+                    match(fromPort, "^992$"), "TelnetS",
+                    match(fromPort, "^514$"), "rShell",
+                    match(fromPort, "^3306$"), "MySQL",
+                    match(fromPort, "^8009$"), "TestPort",
+                    1=1, "Benign"
+                   )
+| where badFromPort!="Benign" OR badToPort!="Benign"
+| table fromPort badFromPort toPort badToPort
